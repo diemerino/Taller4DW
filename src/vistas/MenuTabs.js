@@ -9,6 +9,7 @@ import Box from '@material-ui/core/Box';
 import Autor from './Autor'
 import Libro from './libro';
 import Usuario from './Usuario';
+import Prestamo from './Prestamo';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -62,9 +63,9 @@ export default function MenuTabs() {
     <div className={classes.root}>
       <AppBar position="static">
         <Tabs value={value} onChange={handleChange} aria-label="simple tabs example">
-          <Tab label="Item One" {...a11yProps(0)} />
+          <Tab label="Libro" {...a11yProps(0)} />
           <Tab label="Autor" {...a11yProps(1)} />
-          <Tab label="Item Three" {...a11yProps(2)} />
+          <Tab label="Prestamo" {...a11yProps(2)} />
           <Tab label="Usuario" {...a11yProps(3)} />
         </Tabs>
       </AppBar>
@@ -75,7 +76,7 @@ export default function MenuTabs() {
         <Autor/>
       </TabPanel>
       <TabPanel value={value} index={2}>
-        Item Three
+        <Prestamo/>
       </TabPanel>
 
       <TabPanel value={value} index={3}>

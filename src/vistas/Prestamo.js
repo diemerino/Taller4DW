@@ -49,20 +49,35 @@ export default function Libro() {
 
   const [contador, setContador] = useState(0)
   const [libro, setLibro] = useState([])
+  const [persona, setPersona] = useState([])
+  const [prestamo, setPrestamo] = useState([])
+
   const [accion, setAccion] = useState("Guardar")
   const [idLibro, setIdLibro] = useState(null);
+  const [idPersona, setIdPersona] = useState(null);
+  const [fecha, setFecha ] = useState(Date);
 
   useEffect(() => {
     cargarLibro();
+    cargarPersona();
+    setValue("fecha",fecha);
   }, []);
 
   const seleccionar = (item) => {
-    setValue("nombre", item.nombre)
-    setValue("codigo", item.codigo)
+    setValue("nombrel", item.nombre)
     setIdLibro(item._id)
     // setAccion("Modificar")
-
   }
+  const seleccionar2 = (item) => {
+    setValue("nombrep", item.nombre+' '+item.apellido)
+    //setValue("nombrep", item._id)
+    setIdPersona(item._id)
+    setFecha(Date)
+    console.log(fecha);
+    // setAccion("Modificar")
+  }
+
+
   const columns = [
     {
       name: "Seleccionar",
@@ -81,17 +96,50 @@ export default function Libro() {
         },
       },
     },
-    {
-      name: 'Codigo',
-      field: 'codigo'
-    },
+    // {
+    //   name: 'Codigo',
+    //   field: 'codigo'
+    // },
     {
       name: 'Nombre',
       field: 'nombre'
     }
-
-
+    
   ];
+  const columns2 = [
+    {
+      name: "Seleccionar",
+      options: {
+        headerNoWrap: true,
+        customBodyRender: (item, tablemeta, update) => {
+          return (
+            <Button
+              variant="contained"
+              className="btn-block"
+              onClick={() => seleccionar2(item)}
+            >
+              Seleccionar
+            </Button>
+          );
+        },
+      },
+    },
+    // {
+    //   name: 'Codigo',
+    //   field: 'codigo'
+    // },
+    {
+      name: 'Nombre',
+      field: 'nombre'
+    },
+    {
+        name: 'Apellido',
+        field: 'apellido'
+    }
+    
+  ];
+
+  
 
 
   const options = {
@@ -120,8 +168,10 @@ export default function Libro() {
   const onSubmit = data => {
 
     if (accion == "Guardar") {
+      data.idPersona = idPersona;
+      data.libro = idLibro;
       axios
-        .post("http://localhost:9000/api/libro", data, {
+        .post("http://localhost:9000/api/prestamo", data, {
           headers: {
             Accept: '*/*'
           }
@@ -129,8 +179,13 @@ export default function Libro() {
         .then(
           (response) => {
             if (response.status == 200) {
-              alert("Registro ok")
-              cargarLibro();
+              alert("Registro ok")              
+            //   cargarLibro();
+            //   cargarPersona();
+            //   setIdLibro(idLibro)
+            //   setIdPersona(idPersona)
+              setAccion("Guardar")
+              console.log(response.data)
               reset();
             }
           },
@@ -151,86 +206,30 @@ export default function Libro() {
           console.log(error);
         });
     }
-  //   if (accion == "Modificar") {
-  //     axios
-  //       .put("http://localhost:9000/api/libro/" + idLibro, data)
-  //       .then(
-  //         (response) => {
-  //           if (response.status == 200) {
-  //             alert("Modificado")
-  //             cargarLibro();
-  //             reset();
-  //             setIdLibro(null)
-  //             setAccion("Guardar")
-  //             console.log(response.data)
-  //           }
-  //         },
-  //         (error) => {
-  //           // Swal.fire(
-  //           //   "Error",
-  //           //   "No es posible realizar esta acción: " + error.message,
-  //           //   "error"
-  //           // );
-  //         }
-  //       )
-  //       .catch((error) => {
-  //         // Swal.fire(
-  //         //   "Error",
-  //         //   "No cuenta con los permisos suficientes para realizar esta acción",
-  //         //   "error"
-  //         // );
-  //         console.log(error);
-  //       });
-  //   }
-
-  // }
-
-  // const eliminar = () => {
-  //   if (idLibro == null) {
-  //     alert("Debe seleccionar un autor")
-  //     return
-  //   }
-  //   axios
-  //     .delete("http://localhost:9000/api/libroautor/" + idLibro)
-  //     .then(
-  //       (response) => {
-  //         if (response.status == 200) {
-
-  //           cargarLibro();
-  //           reset();
-  //           setIdLibro(null)
-  //           setAccion("Guardar")
-  //           console.log(response.data)
-  //           alert("Eliminado")
-  //         }
-  //       },
-  //       (error) => {
-  //         // Swal.fire(
-  //         //   "Error",
-  //         //   "No es posible realizar esta acción: " + error.message,
-  //         //   "error"
-  //         // );
-  //       }
-  //     )
-  //     .catch((error) => {
-  //       // Swal.fire(
-  //       //   "Error",
-  //       //   "No cuenta con los permisos suficientes para realizar esta acción",
-  //       //   "error"
-  //       // );
-  //       console.log(error);
-  //     });
-  // }
+  
   }
   const cargarLibro = async () => {
     // const { data } = await axios.get('/api/zona/listar');
 
     const { data } = await axios.get("http://localhost:9000/api/libroautor");
-
     setLibro(data.libroConAutor);
 
 
   };
+  const cargarPersona = async () => {
+    // const { data } = await axios.get('/api/zona/listar');
+
+    const { data } = await axios.get("http://localhost:9000/api/personas");
+    setPersona(data.persona);
+  };
+
+  const cargarPrestamo = async () => {
+    // const { data } = await axios.get('/api/zona/listar');
+
+    const { data } = await axios.get("http://localhost:9000/api/prestamo");
+    setPrestamo(data.resultado);
+  };
+
   function click2() {
     setContador(contador + 1);
   }
@@ -244,40 +243,41 @@ export default function Libro() {
           variant="contained"
 
           className={classes.submit}
-          onClick={() => { reset(); setAccion("Guardar"); setIdLibro(null) }}
+          onClick={() => { reset(); setAccion("Guardar"); setIdLibro(idLibro); setIdPersona(idPersona); setFecha(fecha)}}
         >
           Nuevo
           </Button>
         <Typography component="h1" variant="h5">
-          Libro
+          Prestamo
         </Typography>
         <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                autoComplete="fname"
-                name="codigo"
-                variant="outlined"
-                required
-                fullWidth
             
-                label="Código Libro"
-                autoFocus
-                inputRef={register}
-              />
-            </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
                 variant="outlined"
                 required
                 fullWidth
-                id="nombre"
-                label="Nombre Libro"
-                name="nombre"
+                id="nombrep"
+                label="Nombre Persona"
+                name="nombrep"
                 autoComplete="lname"
                 inputRef={register}
               />
             </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                autoComplete="fname"
+                name="nombrel"
+                variant="outlined"
+                required
+                fullWidth            
+                label="Nombre Libro"
+                autoFocus
+                inputRef={register}
+              />
+            </Grid>
+           
             
 
           </Grid>
@@ -290,8 +290,18 @@ export default function Libro() {
           >
             {accion}
           </Button>
-          {}
-          <Grid item  sm={12}>
+          {/* <Button
+            type="button"
+            fullWidth
+            variant="contained"
+            color="secondary"
+            className={classes.delete}
+            onClick={() => { eliminar() }}
+          >
+            Eliminar
+          </Button> */}
+          <Grid container spacing ={6}>
+          <Grid item  sm={6} >
             <MaterialDatatable
 
               title={"Libros"}
@@ -300,9 +310,19 @@ export default function Libro() {
               options={options}
             />
           </Grid>
-
+          <Grid item  sm={6} >
+            <MaterialDatatable
+              title={"Persona"}
+              data={persona}
+              columns={columns2}
+              options={options}
+            />
+          </Grid>
+          
+          </Grid>
 
         </form>
+        
 
 
       </div>
